@@ -3,17 +3,27 @@ const { Schema, model } = require("mongoose");
 const UsuarioSchema = new Schema({
   name: {
     type: String,
-    require: true
+    required: true
   },
   email:{
     type: String,
-    require: true,
+    required: true,
     unique: true
   },
   password:{
     type: String,
-    require: true
-  }
+    required: true
+  },
+  isActive:{
+    type: Boolean,
+    default: true
+  },
+  roles:{
+    type: String,
+    enum: ['user', 'admin', 'moderator'], // Limits acceptable values
+    default: 'user'
+  },
+
 });
 
-module. exports = model('Usuario', UsuarioSchema)
+module.exports = model('Usuario', UsuarioSchema)
