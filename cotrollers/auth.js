@@ -28,7 +28,7 @@ const crearUsuario = async(req, res = response)=>{
         await usuario.save();
 
         // Generar JWT
-        const token = await generarJWT(usuario.id, usuario.name, usuario.roles );
+        const token = await generarJWT(usuario.id, usuario.name, usuario.roles, usuario.email);
 
         res.status(201).json({
             ok:true,
@@ -70,15 +70,17 @@ const loginUsuario = async(req, res = response)=>{
         }
 
         // Generar  JWT
-        const token = await generarJWT(usuario.id, usuario.name, usuario.roles );
+   
+        const token = await generarJWT(usuario.id, usuario.name, usuario.roles, usuario.email);
 
         res.status(201).json({
             ok:true,
-            uid: usuario.id,
-            name: usuario.name,
-            email: usuario.email,
-            isActive: usuario.isActive,
-            roles: usuario.roles,
+            user:{
+                name: usuario.name,
+                email: usuario.email,
+                isActive: usuario.isActive,
+                roles: usuario.roles,
+            },
             token
         })
 
@@ -92,18 +94,41 @@ const loginUsuario = async(req, res = response)=>{
 }
 
 const revalidarUsuario = async(req, res = response)=>{
-
-    const {uid, name} = req;
-
-    // Generar  JWT
-    const token = await generarJWT(uid, name);
+    const {uid, name, email, roles} = req;
+    console.log("revalida Usuario")
+    console.log(uid, name, email, roles)
     
-    res.json({
-        ok:true,
-        uid,
-        name,
-        token
-    })
+    // Generar  JWT
+    const token = await generarJWT(uid, name, roles, email)
+    
+    try{
+        let usuario = await Usuario.findOne({email});
+
+        if(!usuario){
+            return res.status(400).json({
+                ok: false,
+                msg: "Un usuario no existe con ese email"
+            });
+        }
+
+        res.status(201).json({
+            ok:true,
+            user:{
+                name: usuario.name,
+                email: usuario.email,
+                isActive: usuario.isActive,
+                roles: usuario.roles,
+            },
+            token
+        })
+
+    }catch(error){
+        console.log(error)
+        res.status(500).json({
+            ok: false,
+            msg: 'Por favor hable con el administrador'
+        });
+    }
 }
 
 module.exports ={
