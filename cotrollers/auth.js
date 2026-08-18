@@ -95,8 +95,8 @@ const loginUsuario = async(req, res = response)=>{
 
 const revalidarUsuario = async(req, res = response)=>{
     const {uid, name, email, roles} = req;
-    console.log("revalida Usuario")
-    console.log(uid, name, email, roles)
+    //console.log("revalida Usuario")
+    //console.log(uid, name, email, roles)
     
     // Generar  JWT
     const token = await generarJWT(uid, name, roles, email)
